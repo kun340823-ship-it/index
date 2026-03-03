@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小杰今天上什么课(*ෆ´˘`ෆ*)♡</title>
+    <style>
+        :root {
+            --pink-bg: #ffe4e1;
+            --pink-accent: #ff69b4;
+            --glass-white: rgba(255, 255, 255, 0.75);
+            --deep-pink: #d81b60;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: linear-gradient(180deg, #ffc0cb 0%, #ffe4e1 100%);
+            min-height: 100vh;
+            color: var(--deep-pink);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* 顶部装饰 */
+        .header-section {
+            text-align: center;
+            position: relative;
+            z-index: 100;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.8);
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+
+        .controls {
+            background: var(--glass-white);
+            padding: 12px 20px;
+            border-radius: 50px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid #fff;
+            box-shadow: 0 4px 15px rgba(255, 105, 180, 0.2);
+        }
+
+        input[type="date"] {
+            border: none;
+            background: #fff;
+            color: var(--deep-pink);
+            font-size: 0.9rem;
+            padding: 5px 10px;
+            border-radius: 15px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .info-text {
+            margin-top: 15px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            background: rgba(255, 255, 255, 0.3);
+            display: inline-block;
+            padding: 2px 15px;
+            border-radius: 10px;
+        }
+
+        /* 课表容器 */
+        #schedule-list {
+            max-width: 500px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 100;
+        }
+
+        .course-card {
+            background: var(--glass-white);
+            backdrop-filter: blur(8px);
+            margin-bottom: 15px;
+            padding: 18px;
+            border-radius: 24px;
+            border: 1.5px solid #fff;
+            box-shadow: 0 8px 25px rgba(255, 182, 193, 0.3);
+            animation: slideIn 0.5s ease-out;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .time-badge {
+            background: linear-gradient(90deg, #ff69b4, #ff85c0);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            align-self: flex-start;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(255, 105, 180, 0.3);
+        }
+
+        .course-name {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 6px;
+            color: #c2185b;
+        }
+
+        .course-meta {
+            font-size: 0.95rem;
+            color: #880e4f;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .no-class {
+            text-align: center;
+            padding: 50px 20px;
+            font-size: 1.2rem;
+            background: var(--glass-white);
+            border-radius: 30px;
+            border: 2px dashed #ffb6c1;
+            line-height: 1.6;
+        }
+
+        /* --- 浪漫爱心飘浮特效 --- */
+        .heart {
+            position: fixed;
+            bottom: -50px;
+            pointer-events: none;
+            z-index: 10;
+            animation: floatUp linear forwards;
+            opacity: 0;
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(0) rotate(0deg) translateX(0);
+                opacity: 0;
+            }
+            10% { opacity: 0.7; }
+            100% {
+                transform: translateY(-110vh) rotate(360deg) translateX(var(--sway));
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-section">
+        <h1>小杰今天上什么课(*ෆ´˘`ෆ*)♡</h1>
+        <div class="controls">
+            <span>📅 选择日期:</span>
+            <input type="date" id="dateInput">
+        </div>
+        <br>
+        <div class="info-text" id="weekInfo"></div>
+    </div>
+
+    <div id="schedule-list"></div>
+
+    <script>
+        // 1. 基础配置：3月9号为第一周周一
+        const startDate = new Date('2026-03-09');
+        
+        // 2. 课表核心数据
+        const scheduleData = {
+            1: [ // 周一
+                { name: "大学物理AI", room: "8教103", teacher: "陈茹", slot: 1, weeks: [2,4,6,8,10,12,14,16], time: "08:00-09:35" },
+                { name: "中国近现代史纲要", room: "8教303", teacher: "刘杰", slot: 2, weeks: "all", time: "09:55-11:30" },
+                { name: "大学生心理健康", room: "8教202", teacher: "左玉婷", slot: 5, weeks: "all", time: "16:50-18:25" }
+            ],
+            2: [ // 周二
+                { name: "劳动实践II", room: "[01-02]节", teacher: "杨宏伟", slot: 1, weeks: [2,4,6,8,10,12,14,16], time: "08:00-09:35" },
+                { name: "离散数学", room: "8教403", teacher: "刘爽", slot: 2, weeks: "all", time: "09:55-11:30" },
+                { name: "数据库应用", room: "11教402", teacher: "张虹", slot: 3, weeks: "all", time: "13:10-14:45" },
+                { name: "高等数学AII", room: "8教401", teacher: "徐美林", slot: 4, weeks: "all", time: "15:00-16:35" },
+                { name: "基础外语AII", room: "8教106", teacher: "吉玲", slot: 5, weeks: "all", time: "16:50-18:25" }
+            ],
+            3: [ // 周三
+                { name: "程序设计基础II", room: "10教201", teacher: "王思敏", slot: 1, weeks: "all", time: "08:00-09:35" },
+                { name: "体育II", room: "操场/馆内", teacher: "体育老师", slot: 2, weeks: "all", time: "09:55-11:30" }
+            ],
+            4: [ // 周四
+                { name: "高等数学AII", room: "8教401", teacher: "徐美林", slot: 2, weeks: [2,4,6,8,10,12,14,16], time: "09:55-11:30" },
+                { name: "大学物理AI", room: "8教402", teacher: "陈茹", slot: 4, weeks: "all", time: "15:00-16:35" },
+                { name: "形势与政策I", room: "8教204", teacher: "孙超", slot: 5, weeks: [9,10,11,12], time: "16:50-18:25" }
+            ],
+            5: [ // 周五
+                { name: "程序设计基础II", room: "10教201", teacher: "王思敏", slot: 1, weeks: [2,4,6,8,10,12,14,16], time: "08:00-09:35" },
+                { name: "离散数学", room: "8教403", teacher: "刘爽", slot: 1, weeks: [9,11,13,15], time: "08:00-09:35" },
+                { name: "高等数学AII", room: "8教401", teacher: "徐美林", slot: 3, weeks: "all", time: "13:10-14:45" },
+                { name: "基础外语AII", room: "8教106", teacher: "吉玲", slot: 4, weeks: "all", time: "15:00-16:35" }
+            ]
+        };
+
+        const dateInput = document.getElementById('dateInput');
+        const listDiv = document.getElementById('schedule-list');
+        const weekInfoDiv = document.getElementById('weekInfo');
+
+        // 初始化日期
+        const now = new Date();
+        dateInput.value = now.toISOString().split('T')[0];
+
+        function update() {
+            const selectedDate = new Date(dateInput.value);
+            const diffTime = selectedDate - startDate;
+            const currentWeek = Math.floor(diffTime / (7 * 24 * 60 * 60 * 1000)) + 1;
+            const day = selectedDate.getDay();
+
+            // 显示周次信息
+            if (currentWeek >= 1 && currentWeek <= 16) {
+                weekInfoDiv.innerText = `第 ${currentWeek} 周 | 星期${"日一二三四五六"[day]}`;
+            } else {
+                weekInfoDiv.innerText = `非正式教学周 | 星期${"日一二三四五六"[day]}`;
+            }
+
+            listDiv.innerHTML = '';
+            const todayClasses = scheduleData[day] || [];
+            const activeClasses = todayClasses.filter(c => {
+                if (c.weeks === "all") return currentWeek >=1 && currentWeek <=16;
+                return Array.isArray(c.weeks) && c.weeks.includes(currentWeek);
+            });
+
+            if (activeClasses.length === 0) {
+                const happyMsgs = [
+                    "✨ 今天没有课，是属于小杰的自由时光！ ✨",
+                    "🍓 捕捉到一天没课的快乐，去吃顿好吃的吧！ 🍓",
+                    "🌈 没课的日子，也要记得给心情放个假鸭！ 🌈",
+                    "☁️ 云朵偷喝了我的酒，今天没课正好去吹吹风~ ☁️",
+                    "🍭 全身细胞都在说：今天休息，万岁！ 🍭"
+                ];
+                const randomMsg = happyMsgs[Math.floor(Math.random() * happyMsgs.length)];
+                listDiv.innerHTML = `<div class="no-class">${randomMsg}</div>`;
+            } else {
+                activeClasses.sort((a,b)=>a.slot-b.slot).forEach(c => {
+                    listDiv.innerHTML += `
+                        <div class="course-card">
+                            <div class="time-badge">🕒 第${c.slot}大节 ${c.time}</div>
+                            <div class="course-name">${c.name}</div>
+                            <div class="course-meta">
+                                <span>📍 ${c.room}</span>
+                                <span>👤 ${c.teacher}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+        }
+
+        dateInput.addEventListener('change', update);
+        update();
+
+        // 3. 增强版爱心发射器
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.classList.add('heart');
+            
+            // 随机爱心形状
+            const shapes = ['❤', '💖', '💗', '💕', '🌸'];
+            heart.innerHTML = shapes[Math.floor(Math.random() * shapes.length)];
+            
+            const left = Math.random() * 100; 
+            const size = Math.random() * 20 + 15; 
+            const duration = Math.random() * 3 + 4; 
+            const sway = (Math.random() - 0.5) * 300; 
+            
+            heart.style.left = left + 'vw';
+            heart.style.fontSize = size + 'px';
+            heart.style.setProperty('--sway', sway + 'px');
+            heart.style.animationDuration = duration + 's';
+            
+            // 粉色系配色
+            const colors = ['#ff69b4', '#ffb6c1', '#ff1493', '#db7093', '#ffc0cb', '#f48fb1'];
+            heart.style.color = colors[Math.floor(Math.random() * colors.length)];
+            heart.style.textShadow = '0 0 5px rgba(255,255,255,0.5)';
+
+            document.body.appendChild(heart);
+
+            setTimeout(() => { heart.remove(); }, duration * 1000);
+        }
+
+        // 高频生成，实现“很多爱心”的效果
+        setInterval(createHeart, 250);
+    </script>
+</body>
+</html>
